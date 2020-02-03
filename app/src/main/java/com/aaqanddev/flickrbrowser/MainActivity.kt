@@ -18,6 +18,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         val getRawData = GetRawData()
+        getRawData.setDownloadCompleteListener(this)
         getRawData.execute("https://api.flickr.com/services/feeds/photos_public.gne?tags=android,oreo&format=json&nojsoncallback=1")
 
         fab.setOnClickListener { view ->

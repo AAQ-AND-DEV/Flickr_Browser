@@ -14,8 +14,14 @@ class GetRawData : AsyncTask<String, Void, String>() {
     private val TAG = "GetRawData"
     private var downloadStatus = DownloadStatus.IDLE
 
-    override fun onPostExecute(result: String?) {
-        Log.d(TAG, "OnpostExectute valled, paramter is $result")
+    private var listener: MainActivity? = null
+
+    fun setDownloadCompleteListener(callbackObject: MainActivity){
+        listener = callbackObject
+    }
+    override fun onPostExecute(result: String) {
+        Log.d(TAG, "onPostExecute called, parameter is $result")
+        listener?.onDownloadComplete(result, downloadStatus)
     }
 
     override fun doInBackground(vararg params: String?): String {
