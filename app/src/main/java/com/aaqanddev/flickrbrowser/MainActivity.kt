@@ -1,5 +1,6 @@
 package com.aaqanddev.flickrbrowser
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -44,7 +45,12 @@ class MainActivity : BaseActivity(), GetRawData.OnDownloadComplete,
 
     override fun onItemLongClick(view: View, pos: Int) {
         Log.d(TAG, ".onItemLongClick")
-        Toast.makeText(this, "Long tap at position $pos", Toast.LENGTH_SHORT).show()
+        val photo = flickrRecyclerViewAdapter.getPhoto(pos)
+        if (photo!= null){
+            val intent = Intent(this, PhotoDetailsActivity::class.java)
+            intent.putExtra(PHOTO_TRANSFER, photo)
+            startActivity(intent)
+        }
     }
 
     private fun createUri(baseUrl: String, searchCriteria: String, lang: String, matchAll: Boolean): String{
