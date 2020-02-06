@@ -10,6 +10,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 
 import kotlinx.android.synthetic.main.content_main.*
@@ -30,9 +31,7 @@ class MainActivity : BaseActivity(), GetRawData.OnDownloadComplete,
         recycler_view.addOnItemTouchListener(RecyclerItemClickListener(this, recycler_view, this))
         recycler_view.adapter = flickrRecyclerViewAdapter
 
-        val url = createUri("https://api.flickr.com/services/feeds/photos_public.gne", "android,oreo","en-us", true)
-        val getRawData = GetRawData(this)
-        getRawData.execute(url)
+
 
 
     }
@@ -56,7 +55,7 @@ class MainActivity : BaseActivity(), GetRawData.OnDownloadComplete,
     private fun createUri(baseUrl: String, searchCriteria: String, lang: String, matchAll: Boolean): String{
         Log.d(TAG, ".createUri starts")
 
-        var uri = Uri.parse(baseUrl)
+        val uri = Uri.parse(baseUrl)
             .buildUpon()
             .appendQueryParameter("tags", searchCriteria)
             .appendQueryParameter("tagmode", if (matchAll) "ALL" else "ANY")
@@ -81,7 +80,10 @@ class MainActivity : BaseActivity(), GetRawData.OnDownloadComplete,
         // as you specify a parent activity in AndroidManifest.xml.
         Log.d(TAG, "onOptionsItemSelected Called")
         return when (item.itemId) {
-            R.id.action_settings -> true
+            R.id.action_search -> {
+                startActivity(Intent(this, SearchActivity::class.java))
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -104,6 +106,21 @@ class MainActivity : BaseActivity(), GetRawData.OnDownloadComplete,
 
     override fun onError(exception: Exception) {
         Log.e(TAG, "onError called with ${exception.message}")
+    }
+
+    override fun onResume() {
+        Log.d(TAG, ".onResume starts")
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        val queryResult = sharedPreferences.getString(FLICKR_QUERY, "")
+        if (queryResult!=null){
+            if(queryResult.isNotEmpty()){
+                val url = createUri("https://api.flickr.com/services/feeds/photos_public.gne", queryResult,"en-us", true)
+                val getRawData = GetRawData(this)
+                getRawData.execute(url)
+        }
+
+        }
+        super.onResume()
     }
 
     companion object {
